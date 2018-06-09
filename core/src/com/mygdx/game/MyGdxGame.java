@@ -2,34 +2,55 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.utils.Align;
 
 
 public class MyGdxGame extends ApplicationAdapter {
-    SpriteBatch batch;
+
+
+    SpriteBatch batch, spriteFont;
     Texture wall, marioLeft, marioMid, marioRight, marioWin;
     private Sprite sprite, mario;
     private Rectangle rectangleMario;
     private Rectangle rectangleSprite;
+    private String yourScoreName = "Score:";
+    private String bestScoreName = "Best Score:";
+    BitmapFont yourBitmapFontName;
+    Label.LabelStyle labelStyle;
+    Label myLabel, bestScore;
 
     private final float defaultSize = 200f;
     private final float SPEED = 5f;
     private Rectangle screenBounds;
     private int counter;
+    private int bestScorePonits;
     private long start;
     AccelerometerHandler Accelerometer = new AccelerometerHandler("MIDDLE");
 
     @Override
     public void create() {
-
-
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
         screenBounds = new Rectangle(0, 0, w, h);
+        yourBitmapFontName = new BitmapFont();
+        labelStyle = new Label.LabelStyle(yourBitmapFontName, Color.BLACK);
+        bestScore = new Label(bestScoreName, labelStyle);
+        myLabel = new Label(yourScoreName, labelStyle);
+        myLabel.setPosition(700, 0);
+        bestScore.setPosition(700, Gdx.graphics.getHeight()-17);
+        myLabel.setAlignment(Align.center);
+        bestScore.setAlignment(Align.center);
+        myLabel.setColor(Color.BLACK);
+        bestScore.setColor(Color.BLUE);
+
         batch = new SpriteBatch();
         wall = new Texture("wall.jpg");
         marioLeft = new Texture("marioLeft.png");
@@ -44,13 +65,15 @@ public class MyGdxGame extends ApplicationAdapter {
         mario.setSize(defaultSize, defaultSize);
         rectangleMario = new Rectangle(mario.getX(), mario.getY(), mario.getWidth(), mario.getHeight());
         rectangleSprite = new Rectangle(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
-        start=System.currentTimeMillis();
+        start = System.currentTimeMillis();
     }
 
     @Override
     public void render() {
         float[] moved = {Gdx.input.getAccelerometerX(), Gdx.input.getAccelerometerY(), Gdx.input.getAccelerometerZ()};
         update(moved);
+        myLabel.setText(yourScoreName + " " + counter);
+        bestScore.setText(bestScoreName + " " + bestScorePonits);
         draw();
     }
 
@@ -73,16 +96,17 @@ public class MyGdxGame extends ApplicationAdapter {
                 create();
             }
 
-        if (Accelerometer.getmovedTo().equals("LEFT")) {
-            mario.setTexture(marioLeft);
-            mario.setPosition(Gdx.graphics.getWidth() * 0.8343f, Gdx.graphics.getHeight() * 0.15f);
-        } else if (Accelerometer.getmovedTo().equals("RIGHT")) {
-            mario.setTexture(marioRight);
-            mario.setPosition(Gdx.graphics.getWidth() * 0.8343f, Gdx.graphics.getHeight() * 0.67f);
-        } else {
-            mario.setTexture(marioMid);
-            mario.setPosition(Gdx.graphics.getWidth() * 0.8343f, Gdx.graphics.getHeight() * 0.45f);
-        }}
+            if (Accelerometer.getmovedTo().equals("LEFT")) {
+                mario.setTexture(marioLeft);
+                mario.setPosition(Gdx.graphics.getWidth() * 0.8343f, Gdx.graphics.getHeight() * 0.15f);
+            } else if (Accelerometer.getmovedTo().equals("RIGHT")) {
+                mario.setTexture(marioRight);
+                mario.setPosition(Gdx.graphics.getWidth() * 0.8343f, Gdx.graphics.getHeight() * 0.67f);
+            } else {
+                mario.setTexture(marioMid);
+                mario.setPosition(Gdx.graphics.getWidth() * 0.8343f, Gdx.graphics.getHeight() * 0.45f);
+            }
+        }
 
         sprite.translate(speedX, speedY);
 
@@ -95,32 +119,36 @@ public class MyGdxGame extends ApplicationAdapter {
 
         boolean isOverlaping = rectangleMario.overlaps(rectangleSprite);
         if (isOverlaping) {
-     //       mario.setTexture(marioWin);
-          //  Gdx.app.exit();
-            counter=0;
+            //       mario.setTexture(marioWin);
+            //  Gdx.app.exit();
+            if (bestScorePonits < counter) {
+                bestScorePonits = counter;
+            }
+            counter = 0;
             create();
         }
 
         // Set sprite position.
 
 
-     //   sprite.setPosition(newX, newY);
+        //   sprite.setPosition(newX, newY);
     }
 
-    private boolean isNotTooOften(){
-        long elapsedTimeMillis = System.currentTimeMillis()-start;
-        float elapsedTimeSec= elapsedTimeMillis/1000f;
-        if (elapsedTimeSec>1F){
-            start=System.currentTimeMillis();
-            return true;}
-            else return false;
+    private boolean isNotTooOften() {
+        long elapsedTimeMillis = System.currentTimeMillis() - start;
+        float elapsedTimeSec = elapsedTimeMillis / 1000f;
+        if (elapsedTimeSec > 1F) {
+            start = System.currentTimeMillis();
+            return true;
+        } else return false;
     }
 
     private void draw() {
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
         batch.begin();
+        myLabel.draw(batch, 4);
+        bestScore.draw(batch,4);
         sprite.draw(batch);
         mario.draw(batch);
         batch.end();
