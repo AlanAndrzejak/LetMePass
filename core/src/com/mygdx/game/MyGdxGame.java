@@ -70,7 +70,7 @@ public class MyGdxGame extends ApplicationAdapter {
             if (Accelerometer.isStop()) {
                 ++counter;
                 mario.setTexture(marioWin);
-            //    Gdx.app.exit();
+                create();
             }
 
         if (Accelerometer.getmovedTo().equals("LEFT")) {
@@ -97,8 +97,8 @@ public class MyGdxGame extends ApplicationAdapter {
         if (isOverlaping) {
      //       mario.setTexture(marioWin);
           //  Gdx.app.exit();
-            sprite.setOriginCenter();
-            sprite.setPosition(newX * 0f, newY * 0f);
+            counter=0;
+            create();
         }
 
         // Set sprite position.
