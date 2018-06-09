@@ -17,9 +17,10 @@ public class MyGdxGame extends ApplicationAdapter {
     private Rectangle rectangleSprite;
 
     private final float defaultSize = 200f;
-    private final float SPEED = 7f;
+    private final float SPEED = 5f;
     private Rectangle screenBounds;
     private int counter;
+    private long start;
     AccelerometerHandler Accelerometer = new AccelerometerHandler("MIDDLE");
 
     @Override
@@ -43,6 +44,7 @@ public class MyGdxGame extends ApplicationAdapter {
         mario.setSize(defaultSize, defaultSize);
         rectangleMario = new Rectangle(mario.getX(), mario.getY(), mario.getWidth(), mario.getHeight());
         rectangleSprite = new Rectangle(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
+        start=System.currentTimeMillis();
     }
 
     @Override
@@ -63,14 +65,14 @@ public class MyGdxGame extends ApplicationAdapter {
         float speedX = SPEED;
         float speedY = 0f;
         float accelationSquareRoot = (dt[0] * dt[0] + dt[2] * dt[2]) / (9.5f * 9.5f);
-        if (accelationSquareRoot >= 2) {
+        if (accelationSquareRoot >= 2 && isNotTooOften()) {
             Accelerometer.calculateDirection(dt[0], dt[2]);
             if (Accelerometer.isStop()) {
                 ++counter;
                 mario.setTexture(marioWin);
             //    Gdx.app.exit();
             }
-        }
+
         if (Accelerometer.getmovedTo().equals("LEFT")) {
             mario.setTexture(marioLeft);
             mario.setPosition(Gdx.graphics.getWidth() * 0.8343f, Gdx.graphics.getHeight() * 0.15f);
@@ -80,7 +82,7 @@ public class MyGdxGame extends ApplicationAdapter {
         } else {
             mario.setTexture(marioMid);
             mario.setPosition(Gdx.graphics.getWidth() * 0.8343f, Gdx.graphics.getHeight() * 0.45f);
-        }
+        }}
 
         sprite.translate(speedX, speedY);
 
@@ -93,7 +95,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
         boolean isOverlaping = rectangleMario.overlaps(rectangleSprite);
         if (isOverlaping) {
-            mario.setTexture(marioWin);
+     //       mario.setTexture(marioWin);
           //  Gdx.app.exit();
             sprite.setOriginCenter();
             sprite.setPosition(newX * 0f, newY * 0f);
@@ -103,6 +105,15 @@ public class MyGdxGame extends ApplicationAdapter {
 
 
      //   sprite.setPosition(newX, newY);
+    }
+
+    private boolean isNotTooOften(){
+        long elapsedTimeMillis = System.currentTimeMillis()-start;
+        float elapsedTimeSec= elapsedTimeMillis/1000f;
+        if (elapsedTimeSec>1F){
+            start=System.currentTimeMillis();
+            return true;}
+            else return false;
     }
 
     private void draw() {
