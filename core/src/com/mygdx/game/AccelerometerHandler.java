@@ -29,7 +29,7 @@ public class AccelerometerHandler {
     }
 
     public void calculateDirection(float x, float z) {
-        if (Math.abs(x) < Math.abs(z)) {
+        if (Math.abs(x) < Math.abs(z)*0.7f) {
             this.stop = true;
         } else if (x < 0) {
             if (this.movedTo.equals("RIGHT")) {

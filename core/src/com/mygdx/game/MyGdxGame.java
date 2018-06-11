@@ -30,7 +30,7 @@ public class MyGdxGame extends ApplicationAdapter {
     private int posQy = -15;
     private float angle = 90;
     private SpriteBatch batch, spriteBatch;
-    private Texture wall, marioLeft, marioMid, marioRight, marioWin;
+    private Texture wall, marioLeft, marioMid, marioRight, marioWin, marioLosse;
     private Sprite sprite, mario;
     private Rectangle rectangleMario;
     private Rectangle rectangleSprite;
@@ -80,6 +80,7 @@ public class MyGdxGame extends ApplicationAdapter {
         marioMid = new Texture("marioMid.png");
         marioRight = new Texture("marioRight.png");
         marioWin = new Texture("marioWin.png");
+        marioLosse= new Texture("marioMushroom.png");
         sprite = new Sprite(wall);
         mario = new Sprite(marioMid);
         sprite.setOriginCenter();
@@ -123,13 +124,14 @@ public class MyGdxGame extends ApplicationAdapter {
                         bestScorePonits = counter;
                     }
                     losse();
+                    mario.setTexture(marioLosse);
                     newRandom();
                 }
 
 
             } else if (Accelerometer.getmovedTo().equals("LEFT")) {
                 mario.setTexture(marioLeft);
-                mario.setPosition(Gdx.graphics.getWidth() * 0.8343f, Gdx.graphics.getHeight() * 0.15f);
+                mario.setPosition(Gdx.graphics.getWidth() * 0.8343f, Gdx.graphics.getHeight() * 0.10f);
             } else if (Accelerometer.getmovedTo().equals("RIGHT")) {
                 mario.setTexture(marioRight);
                 mario.setPosition(Gdx.graphics.getWidth() * 0.8343f, Gdx.graphics.getHeight() * 0.67f);
