@@ -8,44 +8,67 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
+
+import java.util.ArrayList;
 
 
 public class MyGdxGame extends ApplicationAdapter {
 
 
-    SpriteBatch batch, spriteFont;
-    Texture wall, marioLeft, marioMid, marioRight, marioWin;
+    private int posAx = 20;
+    private int posAy = -80;
+    private int posBx = 320;
+    private int posBy = -80;
+    private int posCx = 580;
+    private int posCy = -80;
+    private int posQx = 280;
+    private int posQy = -15;
+    private float angle = 90;
+    private SpriteBatch batch, spriteBatch;
+    private Texture wall, marioLeft, marioMid, marioRight, marioWin;
     private Sprite sprite, mario;
     private Rectangle rectangleMario;
     private Rectangle rectangleSprite;
     private String yourScoreName = "Score:";
     private String bestScoreName = "Best Score:";
-    BitmapFont yourBitmapFontName;
-    Label.LabelStyle labelStyle;
-    Label myLabel, bestScore;
-
+    private BitmapFont yourBitmapFontName;
+    private Label.LabelStyle labelStyle;
+    private Label myLabel, bestScore;
+    private BitmapFont font;
+    Matrix4 mx4Font = new Matrix4();
+    private ArrayList<Question> questions = Question.getActualQuestions();
+    int random;
     private final float defaultSize = 200f;
-    private final float SPEED = 5f;
-    private Rectangle screenBounds;
+    private final float SPEED = 1f;
     private int counter;
     private int bestScorePonits;
     private long start;
     AccelerometerHandler Accelerometer = new AccelerometerHandler("MIDDLE");
 
+
     @Override
     public void create() {
+        Question.setDefualtActualQuestions();
+        spriteBatch = new SpriteBatch();
+        font = new BitmapFont();
+        mx4Font.rotate(new Vector3(0, 0, 1), angle);
+        mx4Font.trn(0, 0, 0);
+
+
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
-        screenBounds = new Rectangle(0, 0, w, h);
         yourBitmapFontName = new BitmapFont();
         labelStyle = new Label.LabelStyle(yourBitmapFontName, Color.BLACK);
         bestScore = new Label(bestScoreName, labelStyle);
         myLabel = new Label(yourScoreName, labelStyle);
+
         myLabel.setPosition(700, 0);
-        bestScore.setPosition(700, Gdx.graphics.getHeight()-17);
+        bestScore.setPosition(700, Gdx.graphics.getHeight() - 17);
         myLabel.setAlignment(Align.center);
         bestScore.setAlignment(Align.center);
         myLabel.setColor(Color.BLACK);
@@ -88,15 +111,23 @@ public class MyGdxGame extends ApplicationAdapter {
         float speedX = SPEED;
         float speedY = 0f;
         float accelationSquareRoot = (dt[0] * dt[0] + dt[2] * dt[2]) / (9.5f * 9.5f);
-        if (accelationSquareRoot >= 2 && isNotTooOften()) {
+        if (accelationSquareRoot >= 3 && isNotTooOften()) {
             Accelerometer.calculateDirection(dt[0], dt[2]);
             if (Accelerometer.isStop()) {
-                ++counter;
-                mario.setTexture(marioWin);
-                create();
-            }
+                Accelerometer.setStop(false);
+                if (questions.get(random).isCorrectAnswer(Accelerometer.getPosition())) {
+                    win();
+                    newRandom();
+                } else {
+                    if (bestScorePonits < counter) {
+                        bestScorePonits = counter;
+                    }
+                    losse();
+                    newRandom();
+                }
 
-            if (Accelerometer.getmovedTo().equals("LEFT")) {
+
+            } else if (Accelerometer.getmovedTo().equals("LEFT")) {
                 mario.setTexture(marioLeft);
                 mario.setPosition(Gdx.graphics.getWidth() * 0.8343f, Gdx.graphics.getHeight() * 0.15f);
             } else if (Accelerometer.getmovedTo().equals("RIGHT")) {
@@ -110,28 +141,16 @@ public class MyGdxGame extends ApplicationAdapter {
 
         sprite.translate(speedX, speedY);
 
-        float screenLeft = screenBounds.getX();
-        float screenRight = screenLeft + screenBounds.getWidth() - sprite.getBoundingRectangle().getWidth();
-        float newX = sprite.getX();
-        float newY = sprite.getY();
         rectangleMario = mario.getBoundingRectangle();
         rectangleSprite = sprite.getBoundingRectangle();
 
         boolean isOverlaping = rectangleMario.overlaps(rectangleSprite);
         if (isOverlaping) {
-            //       mario.setTexture(marioWin);
-            //  Gdx.app.exit();
             if (bestScorePonits < counter) {
                 bestScorePonits = counter;
             }
-            counter = 0;
-            create();
+            losse();
         }
-
-        // Set sprite position.
-
-
-        //   sprite.setPosition(newX, newY);
     }
 
     private boolean isNotTooOften() {
@@ -146,11 +165,51 @@ public class MyGdxGame extends ApplicationAdapter {
     private void draw() {
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        spriteBatch.setTransformMatrix(mx4Font);
+        spriteBatch.begin();
+        font.getData().setScale(2f);
+        font.setColor(Color.BLACK);
+        font.draw(spriteBatch, questions.get(random).getOptionA(), posAx, posAy);
+        font.draw(spriteBatch, questions.get(random).getOptionB(), posBx, posBy);
+        font.draw(spriteBatch, questions.get(random).getOptionC(), posCx, posCy);
+        font.draw(spriteBatch, questions.get(random).getQuestion(), posQx, posQy);
+
+        spriteBatch.end();
+
         batch.begin();
         myLabel.draw(batch, 4);
-        bestScore.draw(batch,4);
+        bestScore.draw(batch, 4);
         sprite.draw(batch);
         mario.draw(batch);
         batch.end();
+    }
+
+    private void losse() {
+        counter = 0;
+        sprite.setPosition(0, 0);
+        Question.clearQuestions();
+        Question.setDefualtActualQuestions();
+    }
+
+    private void win() {
+        ++counter;
+        mario.setTexture(marioWin);
+        sprite.setPosition(0, 0);
+        questions.get(random).removeElements(questions, questions.get(random));
+    }
+
+    private void newRandom() {
+        random = questions.get(0).randomGenerator();
+        validateRandom();
+    }
+
+    private void validateRandom() {
+        if (random >= questions.size())
+            random = questions.size() - 1;
+        if (questions.size() == 1) {
+            Question.setDefualtActualQuestions();
+            questions = Question.getActualQuestions();
+        }
     }
 }
