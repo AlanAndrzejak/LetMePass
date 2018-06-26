@@ -40,6 +40,7 @@ public class MyGdxGame extends ApplicationAdapter {
     private Label.LabelStyle labelStyle;
     private Label myLabel, bestScore;
     private BitmapFont font;
+    private boolean wrongAnswer;
     Matrix4 mx4Font = new Matrix4();
     private ArrayList<Question> questions = Question.getActualQuestions();
     int random;
@@ -80,7 +81,11 @@ public class MyGdxGame extends ApplicationAdapter {
         marioMid = new Texture("marioMid.png");
         marioRight = new Texture("marioRight.png");
         marioWin = new Texture("marioWin.png");
-        marioLosse= new Texture("marioMushroom.png");
+        marioLosse = new Texture("marioMushroom.png");
+        // Change marioLookout  EZ
+        //ie. marioLeft="foo.png"
+        // Change wallLayout  EZ
+        //ie. wall="foo.png"
         sprite = new Sprite(wall);
         mario = new Sprite(marioMid);
         sprite.setOriginCenter();
@@ -107,17 +112,31 @@ public class MyGdxGame extends ApplicationAdapter {
         wall.dispose();
     }
 
+    //MID VIBRATE
+    public void vibrate() {
+        Gdx.input.vibrate(700);
+    }
+
+
     private void update(float[] dt) {
 
         float speedX = SPEED;
         float speedY = 0f;
+        // Change speed  EZ
+        //    speedX = 10f;
+
         float accelationSquareRoot = (dt[0] * dt[0] + dt[2] * dt[2]) / (9.5f * 9.5f);
         if (accelationSquareRoot >= 3 && isNotTooOften()) {
-            Accelerometer.calculateDirection(dt[0], dt[2]);
+            // ADD strange movement if wrong answer
+            if (wrongAnswer) {
+                Accelerometer.calculateDirection(-dt[0], -dt[2]);
+            } else
+                Accelerometer.calculateDirection(dt[0], dt[2]);
             if (Accelerometer.isStop()) {
                 Accelerometer.setStop(false);
                 if (questions.get(random).isCorrectAnswer(Accelerometer.getPosition())) {
                     win();
+                    wrongAnswer = false;
                     newRandom();
                 } else {
                     if (bestScorePonits < counter) {
@@ -126,6 +145,8 @@ public class MyGdxGame extends ApplicationAdapter {
                     losse();
                     mario.setTexture(marioLosse);
                     newRandom();
+                    wrongAnswer = true;
+                    //                  vibrate();  MID vibrate
                 }
 
 
@@ -152,6 +173,9 @@ public class MyGdxGame extends ApplicationAdapter {
                 bestScorePonits = counter;
             }
             losse();
+            mario.setTexture(marioLosse);
+            newRandom();
+            wrongAnswer = true;
         }
     }
 
@@ -180,6 +204,8 @@ public class MyGdxGame extends ApplicationAdapter {
         spriteBatch.end();
 
         batch.begin();
+        myLabel.setFontScale(2f);
+        bestScore.setFontScale(2f);
         myLabel.draw(batch, 4);
         bestScore.draw(batch, 4);
         sprite.draw(batch);

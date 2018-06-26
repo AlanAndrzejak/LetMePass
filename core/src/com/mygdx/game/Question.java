@@ -5,10 +5,10 @@ import java.util.Random;
 
 public final class Question {
     private final String question;
-    private final int answer;
-    private final String optionA;
-    private final String optionB;
-    private final String optionC;
+    private  int answer;
+    private  String optionA;
+    private  String optionB;
+    private  String optionC;
 
 
 
@@ -20,6 +20,7 @@ public final class Question {
         this.optionA = optionA;
         this.optionB = optionB;
         this.optionC = optionC;
+   //     randomizeAnswer();
         actualQuestions.add(this);
     }
 
@@ -36,6 +37,31 @@ public final class Question {
         new Question(0, " (a + b)^2", "a^2+b^2", "a^2+b^2+2ab", "(a+b)*2");
         new Question(0, " 0 * 0 / 0", "0", "Inf", "1");
         new Question(-1, " Ocena za projekt", "5", "4", "3");
+    }
+
+    // Randomize questions HARD
+
+    private void randomizeAnswer(){
+        ArrayList <String> tab= new ArrayList<String>();
+        tab.add(this.optionA);
+        tab.add(this.optionB);
+        tab.add(this.optionC);
+        String correctAnswer = tab.get(this.answer+1);
+        Random rand = new Random();
+       int randomNumber=rand.nextInt(tab.size()-1);
+        this.optionA = tab.get(randomNumber);
+        tab.remove(randomNumber);
+        this.optionB = tab.get(randomNumber%2);
+        tab.remove(randomNumber%2);
+        this.optionC=tab.get(0);
+        if (this.optionC.equals(correctAnswer)){
+            this.answer=1;
+        }
+        else if (this.optionB.equals(correctAnswer)){
+            this.answer=0;
+        }
+        else  this.answer=-1;
+
     }
 
     static public ArrayList<Question> getActualQuestions() {
