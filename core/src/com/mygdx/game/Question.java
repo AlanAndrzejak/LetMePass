@@ -25,18 +25,18 @@ public final class Question {
     }
 
     public static void setDefualtActualQuestions() {
-        new Question(1, " 6: - 2(1+2)", "5", "1", "9");
-        new Question(-1, " 6 + 10 * (14 − 4)", "106", "160", "0");
-        new Question(-1, " 21 -- 7 + 22 − 15", "21", "22", "30");
-        new Question(-1, " 4 * 4 − 28 ÷ 7", "12", "-41", "0");
-        new Question(-1, " 7 + 3 * (9 − 3)", "25", "60", "22");
-        new Question(0, " 13 − 3 * 0", "10", "13", "0");
-        new Question(0, " 6 * 8 + 12 ÷ 4", "30", "51", "42");
-        new Question(-1, " (10 − 8) * 6 + 3", "15", "18", "16");
-        new Question(1, " 5 + (20 − 19) * 7", "13", "42", "12");
-        new Question(0, " (a + b)^2", "a^2+b^2", "a^2+b^2+2ab", "(a+b)*2");
-        new Question(0, " 0 * 0 / 0", "0", "Inf", "1");
-        new Question(-1, " Ocena za projekt", "5", "4", "3");
+        new Question(1, "6:2(1+2)", "5", "1", "9");
+        new Question(-1, "6+10*(14-4)", "106", "160", "0");
+        new Question(-1, "21-7+22-15", "21", "22", "30");
+        new Question(-1, "4*4-28+7", "", "-41", "0");
+        new Question(-1, "7+3(9-3)", "25", "60", "22");
+        new Question(0, "13-3*0", "10", "13", "0");
+        new Question(0, "6*8+12+4", "30", "51", "42");
+        new Question(-1, "(10-8)6+3", "15", "18", "16");
+        new Question(1, "5+(20-19)*7", "13", "42", "12");
+        new Question(0, "(a+b)^2", "a^2+b^2", "a^2+b^2+2ab", "(a+b)*2");
+        new Question(0, "0*0/0", "0", "Inf", "1");
+        new Question(-1, "Ocena za projekt", "5", "4", "3");
     }
 
     // Randomize questions HARD
